@@ -1,193 +1,216 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import pickle
 import time
 
-# ===========================
+import pandas as pd
+import streamlit as st
+
+from src.data.loader import load_data
+from src.pipelines.predict_pipeline import run_prediction_pipeline
+
+# ==========================================================
 # PAGE CONFIG
-# ===========================
+# ==========================================================
+
 st.set_page_config(
     page_title="Fun Calories Burn Predictor 🎉",
-    page_icon="🎈",
+    page_icon="🔥",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
-# ===========================
-# CUSTOM JOLLY CSS
-# ===========================
+# ==========================================================
+# CUSTOM CSS
+# ==========================================================
+
 st.markdown("""
 <style>
-    .main {
-        background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4);
-        color: #2c3e50;
-    }
 
-    .stButton>button {
-        width: 100%;
-        border-radius: 20px;
-        background: linear-gradient(90deg, #ff6a00, #ee0979);
-        color: white;
-        font-size: 20px;
-        font-weight: bold;
-        padding: 12px;
-        border: none;
-        box-shadow: 0px 5px 10px rgba(0,0,0,0.2);
-    }
+.main {
+    background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+}
 
-    .stButton>button:hover {
-        background: linear-gradient(90deg, #ee0979, #ff6a00);
-        transform: scale(1.02);
-    }
+.stButton>button{
+    width:100%;
+    border-radius:20px;
+    background:linear-gradient(90deg,#ff6a00,#ee0979);
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+    padding:12px;
+    border:none;
+}
 
-    .stSuccess {
-        font-size: 22px;
-        font-weight: bold;
-        background: #ffffff;
-        color: #ff1493;
-        border-radius: 15px;
-        padding: 10px;
-        text-align: center;
-    }
+.stButton>button:hover{
+    transform:scale(1.02);
+}
 
-    .big-title {
-        font-size: 55px;
-        font-weight: 900;
-        color: #ff1493;
-        text-align: center;
-        text-shadow: 3px 3px #ffe600;
-    }
+.big-title{
+    font-size:55px;
+    font-weight:900;
+    color:#ff1493;
+    text-align:center;
+}
 
-    .subtitle {
-        font-size: 20px;
-        color: #6a0572;
-        text-align: center;
-        font-weight: bold;
-    }
+.subtitle{
+    font-size:20px;
+    text-align:center;
+    color:#6a0572;
+    font-weight:bold;
+}
 
-    .card {
-        background-color: rgba(255,255,255,0.6);
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0px 5px 10px rgba(0,0,0,0.2);
-        text-align: center;
-        font-weight: bold;
-        color: #2c3e50;
-    }
+.card{
+    background:rgba(255,255,255,.65);
+    padding:20px;
+    border-radius:18px;
+    text-align:center;
+}
 
 </style>
 """, unsafe_allow_html=True)
 
-# ===========================
-# TITLE SECTION
-# ===========================
-st.markdown('<p class="big-title">🎈🔥 FUN CALORIES BURN PREDICTOR 🎉</p>', unsafe_allow_html=True)
+# ==========================================================
+# TITLE
+# ==========================================================
+
 st.markdown(
-    '<p class="subtitle">Move the sliders, press the button, and watch the magic happen! ✨</p>',
-    unsafe_allow_html=True
+    '<p class="big-title">🔥 Calories Burn Prediction 🔥</p>',
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    '<p class="subtitle">Estimate calories burned during exercise using an XGBoost Machine Learning model.</p>',
+    unsafe_allow_html=True,
 )
 
 st.image(
     "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZm81bHYzdjhzbmxzM2tjZjB1MDM3Y3UzYXJzZWU1and4c2NtbzAydyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/IS6CvSgqzzv4T1LMDj/giphy.gif",
-    width=300
+    width=300,
 )
 
 st.markdown("---")
 
-# ===========================
-# LOAD MODEL
-# ===========================
-@st.cache_resource
-def load_model():
-    with open("xgb_model.pkl", "rb") as f:
-        model = pickle.load(f)
-    return model
+# ==========================================================
+# SIDEBAR
+# ==========================================================
 
-model = load_model()
+st.sidebar.header("🏃 Exercise Information")
 
-# ===========================
-# SIDEBAR INPUTS (PLAYFUL)
-# ===========================
-st.sidebar.header("🎭 Your Fun Fitness Inputs")
+gender = st.sidebar.radio(
+    "Gender",
+    ["male", "female"],
+)
 
-gender = st.sidebar.radio("🧍 Choose your gender", ["male", "female"])
+age = st.sidebar.slider(
+    "Age",
+    10,
+    80,
+    25,
+)
 
-age = st.sidebar.slider("🎂 Age", 10, 80, 25)
-height = st.sidebar.slider("📏 Height (cm)", 120, 220, 170)
-weight = st.sidebar.slider("⚖️ Weight (kg)", 30, 150, 70)
-duration = st.sidebar.slider("⏱️ Workout Time (min)", 1, 180, 30)
-heart_rate = st.sidebar.slider("❤️ Heart Rate", 50, 200, 100)
-body_temp = st.sidebar.slider("🌡️ Body Temp (°C)", 35.0, 41.0, 37.0, 0.1)
+height = st.sidebar.slider(
+    "Height (cm)",
+    120,
+    220,
+    170,
+)
 
-# ===========================
-# INPUT SUMMARY CARDS
-# ===========================
-st.markdown("## 🎯 Your Cool Stats")
+weight = st.sidebar.slider(
+    "Weight (kg)",
+    30,
+    150,
+    70,
+)
 
-c1, c2, c3 = st.columns(3)
+duration = st.sidebar.slider(
+    "Exercise Duration (minutes)",
+    1,
+    180,
+    30,
+)
 
-with c1:
+heart_rate = st.sidebar.slider(
+    "Heart Rate",
+    50,
+    200,
+    100,
+)
+
+body_temp = st.sidebar.slider(
+    "Body Temperature (°C)",
+    35.0,
+    41.0,
+    37.0,
+    0.1,
+)
+
+# ==========================================================
+# INPUT SUMMARY
+# ==========================================================
+
+st.markdown("## 📋 Input Summary")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.write("👤 Gender:", gender.capitalize())
-    st.write("🎂 Age:", age)
-    st.write("📏 Height:", height, "cm")
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.write(f"**Gender:** {gender.capitalize()}")
+    st.write(f"**Age:** {age}")
+    st.write(f"**Height:** {height} cm")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-with c2:
+with col2:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.write("⚖️ Weight:", weight, "kg")
-    st.write("⏱️ Duration:", duration, "min")
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.write(f"**Weight:** {weight} kg")
+    st.write(f"**Duration:** {duration} min")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-with c3:
+with col3:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.write("❤️ Heart Rate:", heart_rate)
-    st.write("🌡️ Body Temp:", body_temp, "°C")
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.write(f"**Heart Rate:** {heart_rate}")
+    st.write(f"**Body Temp:** {body_temp} °C")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
-# ===========================
-# FUN PREDICTION BUTTON
-# ===========================
-if st.button("🎉 Predict My Calories Now! 🔥"):
+# ==========================================================
+# PREDICTION
+# ==========================================================
 
-    with st.spinner("🧠 Thinking... 🧠"):
-        time.sleep(1.5)
+if st.button("🔥 Predict Calories Burned"):
 
-    # Manual encoding (same as your dataset)
-    gender_encoded = 0 if gender == "male" else 1
+    input_df = pd.DataFrame({
+        "Gender": [gender],
+        "Age": [age],
+        "Height": [height],
+        "Weight": [weight],
+        "Duration": [duration],
+        "Heart_Rate": [heart_rate],
+        "Body_Temp": [body_temp],
+    })
 
-    features = np.array([[
-        gender_encoded,
-        age,
-        height,
-        weight,
-        duration,
-        heart_rate,
-        body_temp
-    ]])
+    with st.spinner("Predicting..."):
+        time.sleep(1)
 
-    prediction = model.predict(features)[0]
+        prediction = run_prediction_pipeline(input_df)[0]
 
-    # Fun progress bar
     st.progress(100)
 
-    # Confetti effect 🎊
     st.balloons()
 
-    st.success(f"🔥 WOW! You burned approximately **{round(prediction, 2)} kcal!** 💪🎉")
+    st.success(
+        f"Estimated Calories Burned: **{prediction:.2f} kcal**"
+    )
 
-# ===========================
-# OPTIONAL DATASET PREVIEW
-# ===========================
+# ==========================================================
+# DATASET PREVIEW
+# ==========================================================
+
 st.markdown("---")
-st.subheader("📁 Peek at the Dataset (If you're curious 😄)")
+st.subheader("📊 Dataset Preview")
 
-if st.checkbox("Show merged dataset"):
-    exercise = pd.read_csv("exercise.csv")
-    calories = pd.read_csv("calories.csv")
-    df = pd.merge(exercise, calories, on="User_ID")
+if st.checkbox("Show Dataset"):
+
+    df = load_data()
 
     st.dataframe(df.head())
+
+    st.write("Dataset Shape:", df.shape)
