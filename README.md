@@ -1,53 +1,64 @@
-# 🔥 Calories Burnt Prediction API
+# 🔥 Calories Burnt Prediction ML System
 
-A production-ready Machine Learning project that predicts the number of calories burned during exercise using an XGBoost regression model. The project follows a modular architecture with separate components for data processing, model training, prediction, and a FastAPI-powered REST API.
+A production-ready Machine Learning project that predicts the number of calories burned during exercise using an **XGBoost Regression model**.
+
+The project follows a modular machine learning architecture with separate components for data processing, feature engineering, model training, prediction, and deployment.
+
+The system provides two ways to interact with the trained model:
+
+- **FastAPI REST API** for backend prediction services
+- **Streamlit Web Application** for an interactive user interface
 
 ---
 
-## ✨ Features
+# ✨ Features
 
 - Modular machine learning pipeline
 - XGBoost Regression model
 - Automated data preprocessing
-- Model evaluation with MAE, RMSE, and R²
+- Feature engineering pipeline
+- Model evaluation with MAE, RMSE, and R² Score
 - Model persistence using Pickle
 - FastAPI REST API
-- Interactive Swagger UI
+- Interactive Swagger UI documentation
+- Streamlit prediction application
 - Structured logging
 - Configurable project settings
-- Clean project architecture
+- Clean and scalable project architecture
 
 ---
 
-## 📂 Project Structure
+# 📂 Project Structure
 
 ```text
 calories-prediction-ml/
 │
 ├── app/                         # FastAPI application
-│   ├── api/
-│   ├── core/
-│   ├── schemas/
-│   ├── services/
-│   ├── utils/
-│   └── main.py
+│   ├── api/                     # API routes
+│   ├── core/                    # Configuration
+│   ├── schemas/                 # Request/response schemas
+│   ├── services/                # Prediction services
+│   ├── utils/                   # API utilities
+│   └── main.py                  # FastAPI entry point
+│
+├── app.py                       # Streamlit web application
 │
 ├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── external/
+│   ├── raw/                     # Original datasets
+│   ├── processed/               # Processed datasets
+│   └── external/                # External data sources
 │
 ├── models/
-│   ├── trained/
+│   ├── trained/                 # Saved trained models
 │   ├── checkpoints/
-│   └── metrics/
+│   └── metrics/                 # Evaluation results
 │
 ├── notebooks/
-│   └── burnt_calories.ipynb     # Exploratory Data Analysis only
+│   └── burnt_calories.ipynb     # Exploratory Data Analysis
 │
 ├── scripts/
-│   ├── train.py
-│   └── predict.py
+│   ├── train.py                 # Model training script
+│   └── predict.py               # Prediction script
 │
 ├── src/
 │   ├── config.py
@@ -72,7 +83,7 @@ The project uses two datasets:
 - **exercise.csv**
 - **calories.csv**
 
-Both datasets are merged during loading to create the final training dataset.
+The datasets are merged during the data loading process to create the final training dataset.
 
 ---
 
@@ -85,7 +96,7 @@ Raw Data
 Load Dataset
     │
     ▼
-Preprocessing
+Data Preprocessing
     │
     ▼
 Feature Engineering
@@ -94,13 +105,13 @@ Feature Engineering
 Train/Test Split
     │
     ▼
-Train XGBoost Model
+Train XGBoost Regression Model
     │
     ▼
-Evaluate Model
+Model Evaluation
     │
     ▼
-Save Model
+Save Trained Model
 ```
 
 ---
@@ -117,7 +128,7 @@ Save Model
 
 # 🚀 Installation
 
-Clone the repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/ShahvezAli784/calories-prediction-ml.git
@@ -125,27 +136,27 @@ git clone https://github.com/ShahvezAli784/calories-prediction-ml.git
 cd calories-prediction-ml
 ```
 
-Create virtual environment
+Create virtual environment:
 
 ```bash
 python -m venv .venv
 ```
 
-Activate environment
+Activate environment:
 
-Windows
+### Windows
 
 ```bash
 .venv\Scripts\activate
 ```
 
-Linux / macOS
+### Linux / macOS
 
 ```bash
 source .venv/bin/activate
 ```
 
-Install dependencies
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -155,29 +166,33 @@ pip install -r requirements.txt
 
 # 🏋️ Train the Model
 
+Run:
+
 ```bash
 python -m scripts.train
 ```
 
-This command will:
+This will:
 
 - Load datasets
-- Preprocess data
-- Split train/test
+- Perform preprocessing
+- Create training and testing datasets
 - Train the XGBoost model
-- Evaluate performance
-- Save the trained model
+- Evaluate model performance
+- Save trained model
 - Save evaluation metrics
 
 ---
 
 # 🔮 Run Prediction Script
 
+Run:
+
 ```bash
 python -m scripts.predict
 ```
 
-Example output
+Example output:
 
 ```
 Prediction
@@ -187,27 +202,54 @@ Predicted Calories Burned: 189.35
 
 ---
 
-# 🌐 Run FastAPI
+# 🌐 Run FastAPI Application
+
+Start the API server:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Open
+Open:
 
 ```
 http://127.0.0.1:8000/docs
 ```
 
-Swagger UI
+Swagger UI documentation.
 
-or
+or:
 
 ```
 http://127.0.0.1:8000/redoc
 ```
 
-ReDoc Documentation
+ReDoc documentation.
+
+---
+
+# 🎨 Run Streamlit Application
+
+The project includes an interactive Streamlit interface that allows users to predict calories burned through a simple web interface.
+
+Run:
+
+```bash
+streamlit run app.py
+```
+
+The application will open at:
+
+```
+http://localhost:8501
+```
+
+Streamlit features:
+
+- Interactive user input form
+- Real-time calorie prediction
+- Uses the trained XGBoost model
+- No API knowledge required
 
 ---
 
@@ -215,13 +257,13 @@ ReDoc Documentation
 
 ## Predict Calories
 
-**POST**
+### POST
 
 ```
 /predict
 ```
 
-Example Request
+Example Request:
 
 ```json
 {
@@ -235,7 +277,7 @@ Example Request
 }
 ```
 
-Example Response
+Example Response:
 
 ```json
 {
@@ -247,13 +289,13 @@ Example Response
 
 ## Health Check
 
-**GET**
+### GET
 
 ```
 /health
 ```
 
-Response
+Response:
 
 ```json
 {
@@ -265,12 +307,12 @@ Response
 
 # 📝 Exploratory Data Analysis
 
-The notebook contains only:
+The notebook contains only exploratory analysis:
 
 - Dataset overview
 - Missing value analysis
 - Duplicate analysis
-- Distribution plots
+- Distribution analysis
 - Correlation analysis
 - Feature relationships
 - Key insights
@@ -287,6 +329,7 @@ Model training and prediction logic are implemented inside the modular `src/` pa
 - Scikit-learn
 - XGBoost
 - FastAPI
+- Streamlit
 - Pydantic
 - Uvicorn
 - Matplotlib
@@ -296,12 +339,12 @@ Model training and prediction logic are implemented inside the modular `src/` pa
 
 # 📌 Future Improvements
 
-- Docker support
+- Docker containerization
 - CI/CD with GitHub Actions
 - Model versioning
 - Experiment tracking
 - Cloud deployment
-- Unit and integration tests
+- Unit and integration testing
 - Request logging middleware
 
 ---
