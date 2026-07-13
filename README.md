@@ -1,157 +1,148 @@
-# 🔥 Calories Burnt Prediction using Machine Learning
+# 🔥 Calories Burnt Prediction API
 
-An end-to-end Machine Learning project that predicts the number of calories burned during exercise using physiological and activity-related features. The project uses an **XGBoost Regressor** and provides an interactive **Streamlit** web application for real-time predictions.
-
----
-
-## 📌 Project Overview
-
-Estimating calories burned is useful for fitness tracking, weight management, and health monitoring. This project trains a regression model to predict calories burned based on user information such as age, gender, body measurements, exercise duration, heart rate, and body temperature.
-
-The trained model is deployed as a Streamlit web application where users can enter their information and instantly receive calorie burn predictions.
+A production-ready Machine Learning project that predicts the number of calories burned during exercise using an XGBoost regression model. The project follows a modular architecture with separate components for data processing, model training, prediction, and a FastAPI-powered REST API.
 
 ---
 
-## 🚀 Features
+## ✨ Features
 
-- Interactive Streamlit web application
-- Data preprocessing and feature engineering
-- Machine Learning model built using XGBoost
-- Real-time calorie prediction
-- Clean and user-friendly interface
-- Trained model saved for inference
+- Modular machine learning pipeline
+- XGBoost Regression model
+- Automated data preprocessing
+- Model evaluation with MAE, RMSE, and R²
+- Model persistence using Pickle
+- FastAPI REST API
+- Interactive Swagger UI
+- Structured logging
+- Configurable project settings
+- Clean project architecture
 
 ---
 
 ## 📂 Project Structure
 
-```
+```text
 calories-prediction-ml/
 │
-├── app.py                  # Streamlit application
-├── burnt_calories.ipynb    # Model development notebook
-├── calories.csv            # Target dataset
-├── exercise.csv            # Exercise dataset
-├── xgb_model.pkl           # Trained XGBoost model
-├── README.md
+├── app/                         # FastAPI application
+│   ├── api/
+│   ├── core/
+│   ├── schemas/
+│   ├── services/
+│   ├── utils/
+│   └── main.py
+│
+├── data/
+│   ├── raw/
+│   ├── processed/
+│   └── external/
+│
+├── models/
+│   ├── trained/
+│   ├── checkpoints/
+│   └── metrics/
+│
+├── notebooks/
+│   └── burnt_calories.ipynb     # Exploratory Data Analysis only
+│
+├── scripts/
+│   ├── train.py
+│   └── predict.py
+│
+├── src/
+│   ├── config.py
+│   ├── data/
+│   ├── features/
+│   ├── models/
+│   ├── pipelines/
+│   └── utils/
+│
+├── tests/
+│
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## 📊 Dataset
+# 📊 Dataset
 
 The project uses two datasets:
 
 - **exercise.csv**
 - **calories.csv**
 
-These datasets are merged using the User ID to create the final training dataset.
-
-### Features
-
-- Gender
-- Age
-- Height
-- Weight
-- Duration
-- Heart Rate
-- Body Temperature
-
-### Target
-
-- Calories Burned
+Both datasets are merged during loading to create the final training dataset.
 
 ---
 
-## ⚙️ Machine Learning Pipeline
+# ⚙️ Machine Learning Pipeline
 
-The project follows a standard Machine Learning workflow:
-
-1. Data Loading
-2. Data Cleaning
-3. Exploratory Data Analysis (EDA)
-4. Feature Engineering
-5. Train-Test Split
-6. Model Training
-7. Model Evaluation
-8. Model Serialization
-9. Streamlit Deployment
+```
+Raw Data
+    │
+    ▼
+Load Dataset
+    │
+    ▼
+Preprocessing
+    │
+    ▼
+Feature Engineering
+    │
+    ▼
+Train/Test Split
+    │
+    ▼
+Train XGBoost Model
+    │
+    ▼
+Evaluate Model
+    │
+    ▼
+Save Model
+```
 
 ---
 
-## 🤖 Model Used
+# 📈 Model Performance
 
-- **XGBoost Regressor**
-
-Why XGBoost?
-
-- High prediction accuracy
-- Handles non-linear relationships
-- Excellent performance on tabular datasets
-- Fast inference
-## 📈 Model Evaluation
-
-The model was evaluated on a held-out test dataset using standard regression metrics.
-
-| Metric | Description |
-|---------|-------------|
-| Mean Absolute Error (MAE) | Average absolute difference between predicted and actual calorie values. Lower is better. |
-| Mean Squared Error (MSE) | Average squared prediction error. Penalizes larger errors more heavily. Lower is better. |
-| Root Mean Squared Error (RMSE) | Square root of MSE, expressed in the same unit as the target variable. Lower is better. |
-| R² Score | Indicates how well the model explains the variance in the data. Values closer to 1 indicate better performance. |
-
-### Example Results
-
-| Metric | Value |
+| Metric | Score |
 |---------|-------|
-| MAE | 8.52 |
-| MSE | 142.36 |
-| RMSE | 11.9 |
-| R² Score | 0.88 |
-
-### Performance Summary
-
-The XGBoost Regressor demonstrated strong predictive performance on the test dataset. The low MAE and RMSE indicate that prediction errors remain relatively small, while a high R² score shows that the model explains a significant proportion of the variance in calories burned.
-
-## 🛠️ Tech Stack
-
-### Programming Language
-
-- Python
-
-### Machine Learning
-
-- Scikit-learn
-- XGBoost
-
-### Data Analysis
-
-- Pandas
-- NumPy
-
-### Visualization
-
-- Matplotlib
-- Seaborn
-
-### Deployment
-
-- Streamlit
+| MAE | **1.2242** |
+| RMSE | **1.7514** |
+| R² Score | **0.9992** |
 
 ---
 
-## 💻 Installation
+# 🚀 Installation
 
 Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/calories-prediction-ml.git
+git clone https://github.com/ShahvezAli784/calories-prediction-ml.git
+
+cd calories-prediction-ml
 ```
 
-Move into the project directory
+Create virtual environment
 
 ```bash
-cd calories-prediction-ml
+python -m venv .venv
+```
+
+Activate environment
+
+Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+Linux / macOS
+
+```bash
+source .venv/bin/activate
 ```
 
 Install dependencies
@@ -160,59 +151,164 @@ Install dependencies
 pip install -r requirements.txt
 ```
 
-Run the application
+---
+
+# 🏋️ Train the Model
 
 ```bash
-streamlit run app.py
+python -m scripts.train
+```
+
+This command will:
+
+- Load datasets
+- Preprocess data
+- Split train/test
+- Train the XGBoost model
+- Evaluate performance
+- Save the trained model
+- Save evaluation metrics
+
+---
+
+# 🔮 Run Prediction Script
+
+```bash
+python -m scripts.predict
+```
+
+Example output
+
+```
+Prediction
+--------------------
+Predicted Calories Burned: 189.35
 ```
 
 ---
 
-## 📸 Application Workflow
+# 🌐 Run FastAPI
 
-1. Enter user information
-2. Click Predict
-3. Model processes the input
-4. Predicted calories burned are displayed instantly
+```bash
+uvicorn app.main:app --reload
+```
 
----
+Open
 
-## 📚 Skills Demonstrated
+```
+http://127.0.0.1:8000/docs
+```
 
-- Machine Learning
-- Regression
-- Data Preprocessing
-- Feature Engineering
-- Model Serialization
-- Streamlit Deployment
-- Model Inference
-- Data Analysis
-- Python Programming
+Swagger UI
 
----
+or
 
-## 🔮 Future Improvements
+```
+http://127.0.0.1:8000/redoc
+```
 
-- Hyperparameter tuning
-- Cross-validation
-- Model comparison (Random Forest, CatBoost, LightGBM)
-- Feature importance visualization
-- Docker containerization
-- FastAPI REST API
-- Cloud deployment (Render/AWS)
+ReDoc Documentation
 
 ---
 
-## 👨‍💻 Author
+# 📮 API Endpoints
 
-**Shahvez Memon Mahmood**
+## Predict Calories
 
-Aspiring Machine Learning Engineer passionate about building production-ready ML applications.
+**POST**
 
-GitHub: https://github.com/ShahvezAli784
+```
+/predict
+```
 
-LinkedIn: *(Add your LinkedIn profile here)*
+Example Request
+
+```json
+{
+    "gender": "male",
+    "age": 24,
+    "height": 180,
+    "weight": 75,
+    "duration": 30,
+    "heart_rate": 110,
+    "body_temp": 40.0
+}
+```
+
+Example Response
+
+```json
+{
+    "predicted_calories": 227.05
+}
+```
 
 ---
 
-## ⭐ If you found this project useful, consider giving it a star.
+## Health Check
+
+**GET**
+
+```
+/health
+```
+
+Response
+
+```json
+{
+    "status": "healthy"
+}
+```
+
+---
+
+# 📝 Exploratory Data Analysis
+
+The notebook contains only:
+
+- Dataset overview
+- Missing value analysis
+- Duplicate analysis
+- Distribution plots
+- Correlation analysis
+- Feature relationships
+- Key insights
+
+Model training and prediction logic are implemented inside the modular `src/` package.
+
+---
+
+# 🛠️ Technologies Used
+
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+- XGBoost
+- FastAPI
+- Pydantic
+- Uvicorn
+- Matplotlib
+- Seaborn
+
+---
+
+# 📌 Future Improvements
+
+- Docker support
+- CI/CD with GitHub Actions
+- Model versioning
+- Experiment tracking
+- Cloud deployment
+- Unit and integration tests
+- Request logging middleware
+
+---
+
+# 👨‍💻 Author
+
+**Shahvez Memon**
+
+- GitHub: https://github.com/ShahvezAli784
+- LinkedIn: https://linkedin.com/in/shahvez-memon-528a18405
