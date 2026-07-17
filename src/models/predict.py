@@ -15,7 +15,7 @@ from src.utils.logger import logger
 def predict(
     model: Any,
     X: pd.DataFrame,
-):
+)-> pd.Series:
     """
     Generate predictions using a trained model.
 

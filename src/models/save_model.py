@@ -10,11 +10,11 @@ import pickle
 from pathlib import Path
 from typing import Any
 
-from src.config import TRAINED_MODEL_DIR
+from src.config import TRAINED_MODEL_DIR,DEFAULT_MODEL_NAME
 from src.utils.logger import logger
 
 
-DEFAULT_MODEL_NAME = "xgb_model.pkl"
+
 
 
 def save_model(
